@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Topic & Timer with Video Recorder</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #topic { font-size: 24px; margin: 20px 0; }
+        #timer { font-size: 20px; margin: 10px 0; }
+        button { padding: 10px 15px; font-size: 16px; margin: 5px; }
+        video { width: 100%; max-width: 400px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Random Topic Speaker</h1>
+    <div id="topic">Click "Start" to get a topic!</div>
+    <div id="timer">Time: 60s</div>
+    <button id="start">Start</button>
+    <button id="stop" disabled>Stop</button>
+    <video id="preview" autoplay></video>
+    <a id="download" style="display:none" download="recording.webm">Download Recording</a>
+    
+    <script>
+        const topics = ["The future of technology", "Best travel experience", "A skill everyone should learn", "The impact of social media", "Your favorite book and why"];
+        let countdown, mediaRecorder, recordedChunks = [];
+        const topicDiv = document.getElementById("topic");
+        const timerDiv = document.getElementById("timer");
+        const startBtn = document.getElementById("start");
+        const stopBtn = document.getElementById("stop");
+        const preview = document.getElementById("preview");
+        const downloadLink = document.getElementById("download");
+        
+        async function startRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            preview.srcObject = stream;
+            mediaRecorder = new MediaRecorder(stream);
+            recordedChunks = [];
+            mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.style.display = "block";
+            };
+            mediaRecorder.start();
+        }
+        
+        function startTimer(duration) {
+            let time = duration;
+            timerDiv.textContent = `Time: ${time}s`;
+            countdown = setInterval(() => {
+                time--;
+                timerDiv.textContent = `Time: ${time}s`;
+                if (time <= 0) stopRecording();
+            }, 1000);
+        }
+        
+        function stopRecording() {
+            clearInterval(countdown);
+            mediaRecorder.stop();
+            preview.srcObject.getTracks().forEach(track => track.stop());
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        
+        startBtn.addEventListener("click", () => {
+            topicDiv.textContent = topics[Math.floor(Math.random() * topics.length)];
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            startRecording();
+            startTimer(60);
+        });
+        
+        stopBtn.addEventListener("click", stopRecording);
+    </script>
+</body>
+</html>
