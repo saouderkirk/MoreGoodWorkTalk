@@ -9,20 +9,25 @@
         #topic { font-size: 24px; margin: 20px 0; }
         #timer { font-size: 20px; margin: 10px 0; }
         button { padding: 10px 15px; font-size: 16px; margin: 5px; }
-        video { width: 100%; max-width: 400px; margin-top: 20px; }
+        video { width: 100%; max-width: 400px; margin: 20px auto; display: block; }
     </style>
 </head>
 <body>
     <h1>Random Topic Speaker</h1>
     <div id="topic">Click "Start" to get a topic!</div>
     <div id="timer">Time: 60s</div>
+    <video id="preview" autoplay muted></video>
     <button id="start">Start</button>
     <button id="stop" disabled>Stop</button>
-    <video id="preview" autoplay></video>
     <a id="download" style="display:none" download="recording.webm">Download Recording</a>
     
     <script>
-        const topics = ["The future of technology", "Best travel experience", "A skill everyone should learn", "The impact of social media", "Your favorite book and why"];
+        let topics = [];
+        fetch('topics.json')
+            .then(response => response.json())
+            .then(data => topics = data.topics)
+            .catch(error => console.error('Error loading topics:', error));
+        
         let countdown, mediaRecorder, recordedChunks = [];
         const topicDiv = document.getElementById("topic");
         const timerDiv = document.getElementById("timer");
@@ -64,7 +69,11 @@
         }
         
         startBtn.addEventListener("click", () => {
-            topicDiv.textContent = topics[Math.floor(Math.random() * topics.length)];
+            if (topics.length > 0) {
+                topicDiv.textContent = topics[Math.floor(Math.random() * topics.length)];
+            } else {
+                topicDiv.textContent = "Error: No topics loaded.";
+            }
             startBtn.disabled = true;
             stopBtn.disabled = false;
             startRecording();
