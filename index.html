@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Topic & Timer with Video Recorder</title>
+    <title>More Good Work Talk</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
         
@@ -13,9 +13,17 @@
             padding: 20px;
             background-color: #f5f5dc;
         }
-        #topic {
+        #topic-container {
             font-size: 24px;
             margin: 20px 0;
+        }
+        #topic-label {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #topic {
+            font-size: 24px;
         }
         #timer {
             font-size: 20px;
@@ -26,18 +34,30 @@
             padding: 10px 15px;
             font-size: 16px;
             margin: 5px;
+            background-color: #add8e6;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #b0c4de;
         }
         video {
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             margin: 20px auto;
             display: block;
+            border-radius: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Random Topic Speaker</h1>
-    <div id="topic">Click "Start" to get a topic!</div>
+    <h1>More Good Work Talk</h1>
+    <div id="topic-container">
+        <div id="topic-label">Can you tell us about...</div>
+        <div id="topic">Click "Start" to get a topic!</div>
+    </div>
     <div id="timer">Time: 60s</div>
     <video id="preview" autoplay muted></video>
     <button id="start">Start</button>
@@ -119,4 +139,3 @@
     </script>
 </body>
 </html>
-
