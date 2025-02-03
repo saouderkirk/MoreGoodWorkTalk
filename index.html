@@ -43,12 +43,26 @@
         button:disabled {
             background-color: #b0c4de;
         }
+        #download {
+            display: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            margin-top: 40px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
         video {
-            width: 100%;
-            max-width: 500px;
+            width: 300px;
+            height: 300px;
             margin: 20px auto;
             display: block;
-            border-radius: 15px;
+            border-radius: 50%;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -62,7 +76,8 @@
     <video id="preview" autoplay muted></video>
     <button id="start">Start</button>
     <button id="stop" disabled>Stop</button>
-    <a id="download" style="display:none" download="recording.webm">Download Recording</a>
+    <button id="restart" disabled>Restart</button>
+    <a id="download" download="recording.webm">Download Recording</a>
     
     <script>
         let topics = [];
@@ -76,6 +91,7 @@
         const timerDiv = document.getElementById("timer");
         const startBtn = document.getElementById("start");
         const stopBtn = document.getElementById("stop");
+        const restartBtn = document.getElementById("restart");
         const preview = document.getElementById("preview");
         const downloadLink = document.getElementById("download");
         
@@ -88,7 +104,7 @@
             mediaRecorder.onstop = () => {
                 const blob = new Blob(recordedChunks, { type: 'video/webm' });
                 downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.style.display = "block";
+                downloadLink.style.display = "inline-block";
             };
             mediaRecorder.start();
         }
@@ -121,6 +137,7 @@
             preview.srcObject.getTracks().forEach(track => track.stop());
             startBtn.disabled = false;
             stopBtn.disabled = true;
+            restartBtn.disabled = false;
         }
         
         startBtn.addEventListener("click", () => {
@@ -131,8 +148,17 @@
             }
             startBtn.disabled = true;
             stopBtn.disabled = false;
+            restartBtn.disabled = true;
             startRecording();
             startTimer(60);
+        });
+        
+        restartBtn.addEventListener("click", () => {
+            topicDiv.textContent = "Click \"Start\" to get a topic!";
+            timerDiv.textContent = "Time: 60s";
+            startBtn.disabled = false;
+            restartBtn.disabled = true;
+            downloadLink.style.display = "none";
         });
         
         stopBtn.addEventListener("click", stopRecording);
