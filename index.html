@@ -11,7 +11,8 @@
             font-family: 'Roboto', sans-serif;
             text-align: center;
             padding: 20px;
-            background-color: #f5f5dc;
+            background-color: #f0f0f5;
+            color: #333;
         }
         #topic-container {
             font-size: 24px;
@@ -26,35 +27,45 @@
             font-size: 24px;
         }
         #timer {
-            font-size: 20px;
-            margin: 10px 0;
+            font-size: 22px;
+            margin: 15px 0;
             font-weight: bold;
+            padding: 10px;
+            background-color: #ffeb3b;
+            border-radius: 10px;
+            display: inline-block;
         }
         button {
-            padding: 10px 15px;
+            padding: 12px 20px;
             font-size: 16px;
-            margin: 5px;
-            background-color: #add8e6;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
             border: none;
             border-radius: 10px;
-            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
         button:disabled {
             background-color: #b0c4de;
+            cursor: not-allowed;
         }
         #download {
             display: none;
-            padding: 10px 15px;
+            padding: 12px 20px;
             font-size: 16px;
             margin-top: 40px;
             background-color: #ff69b4;
             color: white;
             border: none;
             border-radius: 10px;
-            box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
             text-decoration: none;
-            display: inline-block;
+            pointer-events: none;
+            opacity: 0.5;
         }
         video {
             width: 300px;
@@ -63,6 +74,23 @@
             display: block;
             border-radius: 50%;
             object-fit: cover;
+        }
+        #recordedVideo {
+            display: none;
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #555;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        footer img {
+            width: 100px;
+            height: auto;
         }
     </style>
 </head>
@@ -74,10 +102,16 @@
     </div>
     <div id="timer">Time: 60s</div>
     <video id="preview" autoplay muted></video>
+    <video id="recordedVideo" controls></video>
     <button id="start">Start</button>
     <button id="stop" disabled>Stop</button>
     <button id="restart" disabled>Restart</button>
-    <a id="download" download="recording.webm">Download Recording</a>
+    <a id="download" download="recording.mp4">Download Recording</a>
+    
+    <footer>
+        Created with ❤️ for better communication
+        <img src="traced-Screenshot 2025-02-12 at 6.53.13 AM.png" alt="S12K Logo">
+    </footer>
     
     <script>
         let topics = [];
@@ -86,55 +120,41 @@
             .then(data => topics = data.topics)
             .catch(error => console.error('Error loading topics:', error));
         
-        let countdown, mediaRecorder, recordedChunks = [];
+        let countdown, timeLeft = 60;
         const topicDiv = document.getElementById("topic");
         const timerDiv = document.getElementById("timer");
         const startBtn = document.getElementById("start");
         const stopBtn = document.getElementById("stop");
         const restartBtn = document.getElementById("restart");
-        const preview = document.getElementById("preview");
-        const downloadLink = document.getElementById("download");
-        
-        async function startRecording() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            preview.srcObject = stream;
-            mediaRecorder = new MediaRecorder(stream);
-            recordedChunks = [];
-            mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.style.display = "inline-block";
-            };
-            mediaRecorder.start();
-        }
-        
-        function startTimer(duration) {
-            let time = duration;
-            updateTimerDisplay(time);
-            countdown = setInterval(() => {
-                time--;
-                updateTimerDisplay(time);
-                if (time <= 0) stopRecording();
-            }, 1000);
-        }
         
         function updateTimerDisplay(time) {
             let label;
             if (time > 45) {
-                label = "First Fifteen";
+                label = "Prioritize: 1 Most Important Takeaway";
             } else if (time > 30) {
-                label = "Second Fifteen";
+                label = "Segment: 2 Points";
             } else {
-                label = "Last Thirty";
+                label = "Summarize: 3 Easy Takeaways";
             }
             timerDiv.textContent = `${label} - Time: ${time}s`;
         }
         
+        function startTimer(duration) {
+            timeLeft = duration;
+            updateTimerDisplay(timeLeft);
+            countdown = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    timerDiv.textContent = "Time's up! Wrap it up.";
+                    stopRecording();
+                }
+            }, 1000);
+        }
+        
         function stopRecording() {
             clearInterval(countdown);
-            mediaRecorder.stop();
-            preview.srcObject.getTracks().forEach(track => track.stop());
             startBtn.disabled = false;
             stopBtn.disabled = true;
             restartBtn.disabled = false;
@@ -149,19 +169,8 @@
             startBtn.disabled = true;
             stopBtn.disabled = false;
             restartBtn.disabled = true;
-            startRecording();
             startTimer(60);
         });
-        
-        restartBtn.addEventListener("click", () => {
-            topicDiv.textContent = "Click \"Start\" to get a topic!";
-            timerDiv.textContent = "Time: 60s";
-            startBtn.disabled = false;
-            restartBtn.disabled = true;
-            downloadLink.style.display = "none";
-        });
-        
-        stopBtn.addEventListener("click", stopRecording);
     </script>
 </body>
 </html>
