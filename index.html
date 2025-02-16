@@ -126,38 +126,22 @@
         const startBtn = document.getElementById("start");
         const stopBtn = document.getElementById("stop");
         const restartBtn = document.getElementById("restart");
-        
-        function updateTimerDisplay(time) {
-            let label;
-            if (time > 45) {
-                label = "Prioritize: 1 Most Important Takeaway";
-            } else if (time > 30) {
-                label = "Segment: 2 Points";
-            } else {
-                label = "Summarize: 3 Easy Takeaways";
-            }
-            timerDiv.textContent = `${label} - Time: ${time}s`;
-        }
-        
-        function startTimer(duration) {
-            timeLeft = duration;
-            updateTimerDisplay(timeLeft);
-            countdown = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay(timeLeft);
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    timerDiv.textContent = "Time's up! Wrap it up.";
-                    stopRecording();
-                }
-            }, 1000);
-        }
-        
-        function stopRecording() {
-            clearInterval(countdown);
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            restartBtn.disabled = false;
+        const preview = document.getElementById("preview");
+        const recordedVideo = document.getElementById("recordedVideo");
+        let mediaRecorder, recordedChunks = [];
+
+        async function startRecording() {
+            let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            preview.srcObject = stream;
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+                recordedVideo.src = URL.createObjectURL(blob);
+                recordedVideo.style.display = 'block';
+            };
+            mediaRecorder.start();
         }
         
         startBtn.addEventListener("click", () => {
@@ -170,7 +154,9 @@
             stopBtn.disabled = false;
             restartBtn.disabled = true;
             startTimer(60);
+            startRecording();
         });
     </script>
 </body>
 </html>
+
