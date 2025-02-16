@@ -89,6 +89,11 @@
             justify-content: center;
             gap: 20px;
         }
+        footer a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
         footer img {
             width: 100px;
             height: auto;
@@ -103,15 +108,15 @@
     </div>
     <div id="timer">Time: 60s</div>
     <video id="preview" autoplay muted playsinline></video>
-    <video id="recordedVideo" controls></video>
+    <video id="recordedVideo" controls style="display: none;"></video>
     <button id="start">Start</button>
     <button id="stop" disabled>Stop</button>
-    <button id="restart" disabled>Restart</button>
     <a id="download" download="recording.mp4">Download Recording</a>
     
     <footer>
-        Created with ❤️ for better communication
+        <a href="how-to.html">How To</a>
         <img src="https://github.com/user-attachments/assets/3ec9fd6d-1307-4ed2-804b-0a4738dd17c1" alt="S12K Logo">
+        <a href="about.html">About</a>
     </footer>
     
     <script>
@@ -126,7 +131,6 @@
         const timerDiv = document.getElementById("timer");
         const startBtn = document.getElementById("start");
         const stopBtn = document.getElementById("stop");
-        const restartBtn = document.getElementById("restart");
         const preview = document.getElementById("preview");
         const recordedVideo = document.getElementById("recordedVideo");
         let mediaRecorder, recordedChunks = [];
@@ -134,7 +138,10 @@
         function startTimer(duration) {
             timeLeft = duration;
             countdown = setInterval(() => {
-                timerDiv.textContent = `Time: ${timeLeft}s`;
+                let label = timeLeft > 45 ? "Prioritize: 1 Most Important Takeaway" :
+                            timeLeft > 30 ? "Segment: 2 Points" :
+                            "Summarize: 3 easy to recall takeaways";
+                timerDiv.textContent = `${label} - Time: ${timeLeft}s`;
                 timeLeft--;
                 if (timeLeft < 0) {
                     clearInterval(countdown);
@@ -153,6 +160,7 @@
             mediaRecorder.onstop = () => {
                 const blob = new Blob(recordedChunks, { type: 'video/mp4' });
                 recordedVideo.src = URL.createObjectURL(blob);
+                preview.style.display = 'none';
                 recordedVideo.style.display = 'block';
             };
             mediaRecorder.start();
@@ -176,3 +184,4 @@
         stopBtn.addEventListener("click", stopRecording);
     </script>
 </body>
+</html>
