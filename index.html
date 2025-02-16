@@ -74,6 +74,7 @@
             display: block;
             border-radius: 50%;
             object-fit: cover;
+            background: black;
         }
         #recordedVideo {
             display: none;
@@ -101,7 +102,7 @@
         <div id="topic">Click "Start" to get a topic!</div>
     </div>
     <div id="timer">Time: 60s</div>
-    <video id="preview" autoplay muted></video>
+    <video id="preview" autoplay muted playsinline></video>
     <video id="recordedVideo" controls></video>
     <button id="start">Start</button>
     <button id="stop" disabled>Stop</button>
@@ -130,9 +131,22 @@
         const recordedVideo = document.getElementById("recordedVideo");
         let mediaRecorder, recordedChunks = [];
 
+        function startTimer(duration) {
+            timeLeft = duration;
+            countdown = setInterval(() => {
+                timerDiv.textContent = `Time: ${timeLeft}s`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(countdown);
+                    stopRecording();
+                }
+            }, 1000);
+        }
+
         async function startRecording() {
             let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             preview.srcObject = stream;
+            preview.style.display = 'block';
             recordedChunks = [];
             mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
@@ -144,18 +158,21 @@
             mediaRecorder.start();
         }
         
+        function stopRecording() {
+            clearInterval(countdown);
+            mediaRecorder.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        
         startBtn.addEventListener("click", () => {
-            if (topics.length > 0) {
-                topicDiv.textContent = topics[Math.floor(Math.random() * topics.length)];
-            } else {
-                topicDiv.textContent = "Error: No topics loaded.";
-            }
+            topicDiv.textContent = topics.length > 0 ? topics[Math.floor(Math.random() * topics.length)] : "Error: No topics loaded.";
             startBtn.disabled = true;
             stopBtn.disabled = false;
-            restartBtn.disabled = true;
             startTimer(60);
             startRecording();
         });
+
+        stopBtn.addEventListener("click", stopRecording);
     </script>
 </body>
-</html>
