@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>More Good Work Talk</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap');
         
         body {
             font-family: 'Roboto', sans-serif;
@@ -13,6 +13,14 @@
             padding: 20px;
             background-color: #f0f0f5;
             color: #333;
+        }
+        h1 {
+            font-family: 'Raleway', sans-serif;
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            width: 100%;
+            text-align: center;
         }
         #topic-container {
             font-size: 24px;
@@ -50,22 +58,17 @@
         button:hover {
             background-color: #0056b3;
         }
-        button:disabled {
-            background-color: #b0c4de;
-            cursor: not-allowed;
-        }
         #download {
             display: none;
             padding: 12px 20px;
             font-size: 16px;
-            margin-top: 40px;
+            margin-top: 10px;
             background-color: #ff69b4;
             color: white;
             border: none;
             border-radius: 10px;
             text-decoration: none;
-            pointer-events: none;
-            opacity: 0.5;
+            cursor: pointer;
         }
         video {
             width: 300px;
@@ -85,9 +88,9 @@
             color: #555;
             font-weight: bold;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 20px;
+            gap: 10px;
         }
         footer a {
             text-decoration: none;
@@ -102,6 +105,11 @@
 </head>
 <body>
     <h1>More Good Work Talk</h1>
+    <footer>
+        <a href="how-to.html">How To</a>
+        <img src="https://github.com/user-attachments/assets/3ec9fd6d-1307-4ed2-804b-0a4738dd17c1" alt="S12K Logo">
+        <a href="about.html">About</a>
+    </footer>
     <div id="topic-container">
         <div id="topic-label">Can you tell us about...</div>
         <div id="topic">Click "Start" to get a topic!</div>
@@ -110,8 +118,7 @@
     <video id="preview" autoplay muted playsinline></video>
     <video id="recordedVideo" controls style="display: none;"></video>
     <button id="start">Start</button>
-    <button id="stop" disabled>Stop</button>
-    <a id="download" download="recording.mp4">Download Recording</a>
+    <a id="download" download="recording.mp4">Download</a>
     
     <footer>
         <a href="how-to.html">How To</a>
@@ -130,25 +137,10 @@
         const topicDiv = document.getElementById("topic");
         const timerDiv = document.getElementById("timer");
         const startBtn = document.getElementById("start");
-        const stopBtn = document.getElementById("stop");
         const preview = document.getElementById("preview");
         const recordedVideo = document.getElementById("recordedVideo");
+        const downloadBtn = document.getElementById("download");
         let mediaRecorder, recordedChunks = [];
-
-        function startTimer(duration) {
-            timeLeft = duration;
-            countdown = setInterval(() => {
-                let label = timeLeft > 45 ? "Prioritize: 1 Most Important Takeaway" :
-                            timeLeft > 30 ? "Segment: 2 Points" :
-                            "Summarize: 3 easy to recall takeaways";
-                timerDiv.textContent = `${label} - Time: ${timeLeft}s`;
-                timeLeft--;
-                if (timeLeft < 0) {
-                    clearInterval(countdown);
-                    stopRecording();
-                }
-            }, 1000);
-        }
 
         async function startRecording() {
             let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -162,26 +154,18 @@
                 recordedVideo.src = URL.createObjectURL(blob);
                 preview.style.display = 'none';
                 recordedVideo.style.display = 'block';
+                downloadBtn.style.display = 'block';
+                startBtn.textContent = 'Another?';
+                downloadBtn.href = recordedVideo.src;
             };
             mediaRecorder.start();
-        }
-        
-        function stopRecording() {
-            clearInterval(countdown);
-            mediaRecorder.stop();
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
         }
         
         startBtn.addEventListener("click", () => {
             topicDiv.textContent = topics.length > 0 ? topics[Math.floor(Math.random() * topics.length)] : "Error: No topics loaded.";
             startBtn.disabled = true;
-            stopBtn.disabled = false;
-            startTimer(60);
             startRecording();
         });
-
-        stopBtn.addEventListener("click", stopRecording);
     </script>
 </body>
 </html>
