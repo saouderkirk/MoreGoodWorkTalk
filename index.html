@@ -16,7 +16,7 @@
         }
         h1 {
             font-family: 'Raleway', sans-serif;
-            font-size: 36px;
+            font-size: 5vw;
             font-weight: bold;
             text-transform: uppercase;
             width: 100%;
@@ -88,9 +88,10 @@
             color: #555;
             font-weight: bold;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 20px;
         }
         footer a {
             text-decoration: none;
@@ -142,10 +143,21 @@
         const downloadBtn = document.getElementById("download");
         let mediaRecorder, recordedChunks = [];
 
+        function startTimer() {
+            timeLeft = 60;
+            countdown = setInterval(() => {
+                timerDiv.textContent = `Time: ${timeLeft}s`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(countdown);
+                    mediaRecorder.stop();
+                }
+            }, 1000);
+        }
+
         async function startRecording() {
             let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             preview.srcObject = stream;
-            preview.style.display = 'block';
             recordedChunks = [];
             mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
@@ -159,11 +171,11 @@
                 downloadBtn.href = recordedVideo.src;
             };
             mediaRecorder.start();
+            startTimer();
         }
         
         startBtn.addEventListener("click", () => {
             topicDiv.textContent = topics.length > 0 ? topics[Math.floor(Math.random() * topics.length)] : "Error: No topics loaded.";
-            startBtn.disabled = true;
             startRecording();
         });
     </script>
