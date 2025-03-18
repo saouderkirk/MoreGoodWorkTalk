@@ -44,6 +44,12 @@
             display: inline-block;
         }
         button, #download {
+            display: none;
+            text-align: center;
+            text-decoration: none;
+            width: 150px;
+            margin: 10px auto;
+        } {
             padding: 12px 20px;
             font-size: 16px;
             margin: 10px;
@@ -114,7 +120,7 @@
     <video id="preview" autoplay muted playsinline></video>
     <video id="recordedVideo" controls style="display: none;"></video>
     <button id="start">Start</button>
-    <a id="download" download="recording.mp4">Download</a>
+    <a id="download" download="recording.mp4" style="display: none;">Download</a><br>
     
     <footer>
         <a href="how-to.html">How To</a>
@@ -157,7 +163,7 @@
             let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             preview.srcObject = stream;
             recordedChunks = [];
-            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/mp4; codecs=avc1.42E01E,mp4a.40.2' });
             mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
             mediaRecorder.onstop = () => {
                 const blob = new Blob(recordedChunks, { type: 'video/mp4' });
@@ -183,3 +189,4 @@
     </script>
 </body>
 </html>
+
