@@ -155,9 +155,9 @@
         function startTimer() {
             timeLeft = 60;
             countdown = setInterval(() => {
-                let label = timeLeft > 45 ? "Prioritize: 1 Most Important Takeaway" :
-                            timeLeft > 30 ? "Segment: 2 Points" :
-                            "Summarize: 3 easy to recall takeaways";
+                let label = timeLeft > 45 ? "Prioritize: 1 Most Important Thing" :
+                            timeLeft > 30 ? "Segment: 2 Categories or Types" :
+                            "Summarize: 3 Bite Sized Takeaways";
                 timerDiv.textContent = `${label} - Time: ${timeLeft}s`;
                 timeLeft--;
                 if (timeLeft < 0) {
@@ -187,6 +187,22 @@
         }
         
         startBtn.addEventListener("click", () => {
+    // Reset previous recording state
+    recordedVideo.style.display = 'none';
+    preview.style.display = 'block';
+    downloadBtn.style.display = 'none';
+    recordedVideo.src = '';
+
+    // Reset timer and topic
+    clearInterval(countdown);
+    if (topics.length > 0) {
+        topicDiv.textContent = topics[Math.floor(Math.random() * topics.length)];
+    } else {
+        topicDiv.textContent = "Error: No topics loaded.";
+    }
+
+    // Start new recording
+    startRecording();
             if (topics.length > 0) {
                 topicDiv.textContent = topics[Math.floor(Math.random() * topics.length)];
             } else {
@@ -197,5 +213,3 @@
     </script>
 </body>
 </html>
-
-
