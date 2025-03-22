@@ -152,19 +152,21 @@
         const downloadBtn = document.getElementById("download");
         let mediaRecorder, recordedChunks = [];
 
-        function startTimer() {
+   function startTimer() {
+            const startTime = Date.now();
             timeLeft = 60;
             countdown = setInterval(() => {
-                let label = timeLeft > 45 ? "Prioritize: 1 Most Important Thing" :
-                            timeLeft > 30 ? "Segment: 2 Categories or Types" :
-                            "Summarize: 3 Bite Sized Takeaways";
-                timerDiv.textContent = `${label} - Time: ${timeLeft}s`;
-                timeLeft--;
-                if (timeLeft < 0) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = 60 - elapsed;
+                let label = remaining > 45 ? "Prioritize: 1 Most Important Takeaway" :
+                            remaining > 30 ? "Segment: 2 Categories or Types" :
+                            "Summarize: 3 easy to recall takeaways";
+                timerDiv.textContent = `${label} - Time: ${remaining}s`;
+                if (remaining <= 0) {
                     clearInterval(countdown);
                     mediaRecorder.stop();
                 }
-            }, 1000);
+            }, 250);
         }
 
         async function startRecording() {
